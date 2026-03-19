@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VELRA-Signage Presentation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --accent: #ec4899;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--dark);
+            color: var(--light);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes bgPan {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 10% 10%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        .bg-overlay {
+            position: fixed;
+            top: -10%;
+            left: -10%;
+            width: 120%;
+            height: 120%;
+            background: url('img/bg.png') no-repeat center center/cover;
+            filter: brightness(0.4);
+            z-index: -1;
+            animation: bgPan 30s ease-in-out infinite;
+        }
+
+        .presentation-container {
+            width: 90vw;
+            height: 80vh;
+            max-width: 1200px;
+            position: relative;
+            perspective: 1000px;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 4rem;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: slideEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes slideEntrance {
+            from { opacity: 0; transform: translateY(40px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .slide.active h1 { animation: scaleIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .slide.active h2 { animation: slideInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards; opacity: 0; }
+        .slide.active p { animation: fadeIn 0.8s ease-out 0.4s forwards; opacity: 0; }
+        .slide.active ul li, .slide.active .feature-card { opacity: 0; animation: fadeIn 0.6s ease-out forwards; }
+
+        /* Staggered delays */
+        .slide.active ul li:nth-child(1) { animation-delay: 0.6s; }
+        .slide.active ul li:nth-child(2) { animation-delay: 0.7s; }
+        .slide.active ul li:nth-child(3) { animation-delay: 0.8s; }
+        .slide.active ul li:nth-child(4) { animation-delay: 0.9s; }
+
+        .slide.active .feature-card:nth-child(1) { animation-delay: 0.6s; }
+        .slide.active .feature-card:nth-child(2) { animation-delay: 0.8s; }
+
+        h1 {
+            font-size: 5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+        }
+
+        h2 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            color: var(--primary);
+        }
+
+        p {
+            font-size: 1.5rem;
+            line-height: 1.6;
+            max-width: 900px;
+            color: #94a3b8;
+            margin-bottom: 1rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            width: 100%;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            border: 1px solid var(--glass-border);
+            text-align: left;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.05), transparent);
+            transform: rotate(45deg);
+            transition: 0.6s;
+            pointer-events: none;
+        }
+
+        .feature-card:hover::after {
+            left: 100%;
+            top: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
+        }
+
+        .feature-card h3 {
+            font-size: 1.8rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2rem;
+            z-index: 100;
+        }
+
+        .top-controls {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+            transition: opacity 0.5s ease;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+
+        button:disabled {
+            background: #334155;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        #lang-toggle {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(4px);
+            box-shadow: none;
+            padding: 0.5rem 1rem;
+        }
+
+        .slide-counter {
+            background: var(--glass);
+            padding: 0.5rem 1rem;
+            border-radius: 1rem;
+            backdrop-filter: blur(4px);
+            color: #64748b;
+            font-size: 0.9rem;
+            border: 1px solid var(--glass-border);
+        }
+
+        .logo-top {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            height: 100px;
+            z-index: 100;
+            transition: opacity 0.5s ease;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        ul {
+            list-style: none;
+            text-align: left;
+            width: 100%;
+            max-width: 600px;
+            margin-top: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 1.2rem;
+            padding-left: 2.5rem;
+            position: relative;
+            font-size: 1.5rem;
+        }
+
+        li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        /* Language visibility */
+        [lang="en"] {
+            display: none;
+        }
+
+        .lang-en [lang="vi"] {
+            display: none !important;
+        }
+
+        .lang-en [lang="en"] {
+            display: inline;
+        }
+
+        .lang-en ul[lang="en"],
+        .lang-en div[lang="en"],
+        .lang-en p[lang="en"] {
+            display: block;
+        }
+
+        .lang-en .features-grid[lang="en"] {
+            display: grid;
+        }
+
+        /* Smooth transitions */
+        .slide {
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-overlay"></div>
+    <img src="img/DARK-BG.svg" alt="Logo" class="logo-top">
+
+    <div class="top-controls">
+        <div class="slide-counter" id="slide-number">Slide 1 / 12</div>
+        <button id="lang-toggle">VN | EN</button>
+        <button id="fullscreen-btn">
+            <span lang="vi">Toàn màn hình</span>
+            <span lang="en">Fullscreen</span>
+        </button>
+    </div>
+
+    <div class="presentation-container">
+        <!-- Slide 1 -->
+        <div class="slide active">
+            <h1>VELRA-Signage</h1>
+            <h2 lang="vi">Giải pháp Quản lý Màn hình Quảng cáo Tập trung</h2>
+            <h2 lang="en">Centralized Digital Signage Management Solution</h2>
+            <p lang="vi">Nâng tầm không gian trưng bày và tối ưu hóa hiệu quả truyền thông của bạn.</p>
+            <p lang="en">Elevate your display space and optimize your communication efficiency.</p>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="slide">
+            <h2 lang="vi">Tổng quan về Giải pháp</h2>
+            <h2 lang="en">Solution Overview</h2>
+            <p lang="vi">VELRA-Signage là nền tảng đám mây hiện đại cho phép bạn điều khiển nội dung hiển thị trên hàng
+                ngàn màn hình từ xa.</p>
+            <p lang="en">VELRA-Signage is a modern cloud platform that allows you to control content displayed on
+                thousands of screens remotely.</p>
+            <div class="features-grid" lang="vi">
+                <div class="feature-card">
+                    <h3>Cloud-Based</h3>
+                    <p>Truy cập và quản lý mọi lúc, mọi nơi.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Đồng bộ</h3>
+                    <p>Nội dung được cập nhật ngay lập tức trên toàn hệ thống.</p>
+                </div>
+            </div>
+            <div class="features-grid" lang="en">
+                <div class="feature-card">
+                    <h3>Cloud-Based</h3>
+                    <p>Access and manage anytime, anywhere.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Synchronized</h3>
+                    <p>Content updated instantly across the entire system.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="slide">
+            <h2 lang="vi">Vấn đề Khách hàng gặp phải</h2>
+            <h2 lang="en">Customer Pain Points</h2>
+            <ul lang="vi">
+                <li>Cập nhật nội dung thủ công qua USB tốn thời gian.</li>
+                <li>Không kiểm soát được trạng thái màn hình (Sống/Chết).</li>
+                <li>Nội dung không đồng nhất giữa các chi nhánh.</li>
+                <li>Chi phí vận hành và bảo trì cao.</li>
+            </ul>
+            <ul lang="en">
+                <li>Manual updates via USB are time-consuming.</li>
+                <li>No control over screen status (Online/Offline).</li>
+                <li>Inconsistent content across different branches.</li>
+                <li>High operational and maintenance costs.</li>
+            </ul>
+        </div>
+
+        <!-- Slide 4 -->
+        <div class="slide">
+            <h2 lang="vi">Quản lý Thiết bị (Devices)</h2>
+            <h2 lang="en">Device Management</h2>
+            <p lang="vi">Smart monitoring cho hệ thống màn hình của bạn.</p>
+            <p lang="en">Smart monitoring for your screen system.</p>
+            <div class="features-grid" lang="vi">
+                <div class="feature-card">
+                    <h3>Trạng thái Real-time</h3>
+                    <p>Theo dõi trạng thái Online/Offline trực quan.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Phân nhóm thông minh</h3>
+                    <p>Quản lý theo vùng miền, chi nhánh hoặc loại thiết bị.</p>
+                </div>
+            </div>
+            <div class="features-grid" lang="en">
+                <div class="feature-card">
+                    <h3>Real-time Status</h3>
+                    <p>Visual tracking of Online/Offline status.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Smart Grouping</h3>
+                    <p>Manage by region, branch, or device type.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5 -->
+        <div class="slide">
+            <h2 lang="vi">Quản lý Nội dung (CMS)</h2>
+            <h2 lang="en">Content Management (CMS)</h2>
+            <p lang="vi">Giao diện kéo thả dễ dàng, hỗ trợ mọi định dạng.</p>
+            <p lang="en">Easy drag-and-drop interface, supports all formats.</p>
+            <ul lang="vi">
+                <li>Hỗ trợ Video High-quality (4K), Hình ảnh sắc nét.</li>
+                <li>Thư viện Media tập trung, dễ dàng quản lý.</li>
+                <li>Tự động tối ưu dung lượng khi truyền tải.</li>
+            </ul>
+            <ul lang="en">
+                <li>Supports High-quality Video (4K), crisp Images.</li>
+                <li>Centralized Media library, easy to manage.</li>
+                <li>Automated size optimization for transmission.</li>
+            </ul>
+        </div>
+
+        <!-- Slide 6 -->
+        <div class="slide">
+            <h2 lang="vi">Lập lịch Thông minh (Scheduling)</h2>
+            <h2 lang="en">Smart Scheduling</h2>
+            <p lang="vi">Truyền tải thông điệp đúng thời điểm.</p>
+            <p lang="en">Deliver messages at the right time.</p>
+            <div class="features-grid" lang="vi">
+                <div class="feature-card">
+                    <h3>Lịch phát linh hoạt</h3>
+                    <p>Cài đặt theo giờ, ngày, tuần hoặc tháng.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Ưu tiên hiển thị</h3>
+                    <p>Dễ dàng đẩy nội dung khẩn cấp lên toàn màn hình.</p>
+                </div>
+            </div>
+            <div class="features-grid" lang="en">
+                <div class="feature-card">
+                    <h3>Flexible Scheduling</h3>
+                    <p>Set by hour, day, week, or month.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Priority Display</h3>
+                    <p>Easily push urgent content to all screens.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7 -->
+        <div class="slide">
+            <h2 lang="vi">Báo cáo & Giám sát (KPI)</h2>
+            <h2 lang="en">Reporting & Monitoring (KPI)</h2>
+            <p lang="vi">Minh bạch hóa dữ liệu quảng cáo.</p>
+            <p lang="en">Transparency of advertising data.</p>
+            <div class="features-grid" lang="vi">
+                <div class="feature-card">
+                    <h3>Thống kê lượt phát</h3>
+                    <p>Biết chính xác quảng cáo đã phát bao nhiêu lần.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Health Check</h3>
+                    <p>Cảnh báo ngay lập tức khi thiết bị gặp sự cố.</p>
+                </div>
+            </div>
+            <div class="features-grid" lang="en">
+                <div class="feature-card">
+                    <h3>Playback Stats</h3>
+                    <p>Know exactly how many times ads have played.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Health Check</h3>
+                    <p>Immediate alerts when a device encounters an issue.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8 -->
+        <div class="slide">
+            <h2 lang="vi">Phân quyền & Bảo mật (RBAC)</h2>
+            <h2 lang="en">Permissions & Security (RBAC)</h2>
+            <p lang="vi">An toàn tuyệt đối cho nội dung của bạn.</p>
+            <p lang="en">Absolute safety for your content.</p>
+            <ul lang="vi">
+                <li>Hệ thống phân quyền đa cấp (Admin, Manager, Staff).</li>
+                <li>Nhật ký thao tác chi tiết cho từng người dùng.</li>
+                <li>Bảo mật dữ liệu trên nền tảng AWS/Google Cloud.</li>
+            </ul>
+            <ul lang="en">
+                <li>Multi-level permission system (Admin, Manager, Staff).</li>
+                <li>Detailed operation logs for each user.</li>
+                <li>Data security on AWS/Google Cloud platforms.</li>
+            </ul>
+        </div>
+
+        <!-- Slide 9 -->
+        <div class="slide">
+            <h2 lang="vi">Quản lý Bản quyền (License)</h2>
+            <h2 lang="en">License Management</h2>
+            <p lang="vi">Linh hoạt theo quy mô kinh doanh.</p>
+            <p lang="en">Flexible according to business scale.</p>
+            <div class="features-grid" lang="vi">
+                <div class="feature-card">
+                    <h3>Gói theo thiết bị</h3>
+                    <p>Chỉ trả phí cho những gì bạn sử dụng.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Quản lý thời hạn</h3>
+                    <p>Thông báo gia hạn tự động, tránh gián đoạn.</p>
+                </div>
+            </div>
+            <div class="features-grid" lang="en">
+                <div class="feature-card">
+                    <h3>Device-based Packages</h3>
+                    <p>Only pay for what you use.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Expiry Management</h3>
+                    <p>Automatic renewal notifications, avoid disruption.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10 -->
+        <div class="slide">
+            <h2 lang="vi">Giao diện Thực tế</h2>
+            <h2 lang="en">Real Interface</h2>
+            <p lang="vi">[Hình ảnh giao diện Dashboard chuyên nghiệp tại đây]</p>
+            <p lang="en">[Professional Dashboard interface images here]</p>
+            <div
+                style="background: rgba(255,255,255,0.05); width: 100%; height: 300px; border-radius: 1rem; border: 2px dashed #334155; display: flex; align-items: center; justify-content: center;">
+                <p>Modern Dashboard Interface Preview</p>
+            </div>
+        </div>
+
+        <!-- Slide 11 -->
+        <div class="slide">
+            <h2 lang="vi">Lợi ích mang lại</h2>
+            <h2 lang="en">Key Benefits</h2>
+            <div class="features-grid" lang="vi">
+                <div class="feature-card">
+                    <h3>Tiết kiệm 80%</h3>
+                    <p>Thời gian và nhân sự vận hành hệ thống.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Tăng doanh thu</h3>
+                    <p>Thu hút khách hàng bằng nội dung sống động.</p>
+                </div>
+            </div>
+            <div class="features-grid" lang="en">
+                <div class="feature-card">
+                    <h3>Save 80%</h3>
+                    <p>Operational time and personnel.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Boost Revenue</h3>
+                    <p>Attract customers with vivid content.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12 -->
+        <div class="slide">
+            <h1 lang="vi">Cảm ơn quý khách!</h1>
+            <h1 lang="en">Thank You!</h1>
+            <p lang="vi">Chúng tôi sẵn sàng đồng hành cùng sự phát triển của bạn.</p>
+            <p lang="en">We are ready to accompany your development.</p>
+            <div style="margin-top: 2rem;">
+                <p>Email: Contact@velra.vn</p>
+                <p>Website: velra.vn</p>
+                <p>Hotline: 079 416 8368</p>
+                <p style="margin-top: 1rem; color: var(--primary); font-weight: 700;">
+                    <span lang="vi">Hỏi & Đáp (Q&A)</span>
+                    <span lang="en">Questions & Answers (Q&A)</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        let currentSlide = 0;
+        let currentLang = 'vi';
+        const slides = document.querySelectorAll('.slide');
+        const slideCounter = document.getElementById('slide-number');
+        const langToggle = document.getElementById('lang-toggle');
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const topControls = document.querySelector('.top-controls');
+        const logo = document.querySelector('.logo-top');
+
+        function updateSlide() {
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentSlide);
+            });
+            
+            const total = slides.length;
+            slideCounter.innerText = currentLang === 'vi' 
+                ? `Trang ${currentSlide + 1} / ${total}` 
+                : `Slide ${currentSlide + 1} / ${total}`;
+            langToggle.innerText = currentLang === 'vi' ? 'VN | EN' : 'EN | VN';
+        }
+
+        langToggle.addEventListener('click', () => {
+            currentLang = currentLang === 'vi' ? 'en' : 'vi';
+            document.body.classList.toggle('lang-en', currentLang === 'en');
+            updateSlide();
+        });
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            const isFullscreen = !!document.fullscreenElement;
+            document.body.classList.toggle('is-fullscreen', isFullscreen);
+            if (isFullscreen) {
+                topControls.style.opacity = '0';
+                logo.style.opacity = '0';
+            } else {
+                topControls.style.opacity = '1';
+                logo.style.opacity = '1';
+            }
+        });
+
+        // Show/hide controls on mouse move in fullscreen
+        document.addEventListener('mousemove', () => {
+            if (document.fullscreenElement) {
+                topControls.style.opacity = '1';
+                logo.style.opacity = '1';
+                document.body.style.cursor = 'default';
+                clearTimeout(topControls.timer);
+                topControls.timer = setTimeout(() => {
+                    if (document.fullscreenElement) {
+                        topControls.style.opacity = '0';
+                        logo.style.opacity = '0';
+                        document.body.style.cursor = 'none';
+                    }
+                }, 3000);
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                if (currentSlide < slides.length - 1) {
+                    currentSlide++;
+                    updateSlide();
+                }
+            } else if (e.key === 'ArrowLeft') {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    updateSlide();
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
