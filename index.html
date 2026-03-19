@@ -431,6 +431,100 @@
             display: grid;
         }
 
+        /* Responsive Design */
+        @media (max-width: 1400px) {
+            .presentation-container {
+                padding: 4rem;
+            }
+
+            h1 {
+                font-size: 4rem;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .presentation-container {
+                padding: 3rem;
+                max-width: 95%;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            h1 {
+                font-size: 3.5rem;
+            }
+
+            h2 {
+                font-size: 2.5rem;
+            }
+
+            p {
+                font-size: 1.2rem;
+            }
+
+            .logo-top {
+                height: 70px;
+                top: 1rem;
+                left: 1rem;
+            }
+
+            .top-controls {
+                top: 1rem;
+                right: 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .presentation-container {
+                padding: 2rem;
+                border-radius: 1rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .feature-card {
+                padding: 1.5rem;
+            }
+
+            h1 {
+                font-size: 2.8rem;
+            }
+
+            h2 {
+                font-size: 2rem;
+            }
+
+            p,
+            li {
+                font-size: 1.1rem;
+            }
+
+            .logo-top {
+                height: 50px;
+            }
+        }
+
+        @media (max-height: 800px) {
+            .presentation-container {
+                padding-top: 2rem;
+                padding-bottom: 2rem;
+            }
+
+            h1 {
+                margin-bottom: 1rem;
+            }
+
+            .features-grid {
+                margin-top: 1rem;
+            }
+        }
+
         /* Smooth transitions */
         .slide {
             transition: opacity 0.4s ease, transform 0.4s ease;
@@ -468,10 +562,10 @@
         <div class="slide">
             <h2 lang="vi">Tổng quan về Giải pháp</h2>
             <h2 lang="en">Solution Overview</h2>
-            <p lang="vi">VELRA-Signage là nền tảng đám mây hiện đại cho phép bạn điều khiển nội dung hiển thị trên hàng
-                ngàn màn hình từ xa.</p>
-            <p lang="en">VELRA-Signage is a modern cloud platform that allows you to control content displayed on
-                thousands of screens remotely.</p>
+            <p lang="vi">VELRA-Signage là nền tảng linh hoạt hỗ trợ vận hành cả trên Cloud lẫn Local tại phía khách hàng, giúp
+                điều khiển nội dung hiển thị từ xa.</p>
+            <p lang="en">VELRA-Signage is a flexible platform supporting both Cloud and Local operations at the client
+                side, allowing remote content control.</p>
             <div class="features-grid" lang="vi">
                 <div class="feature-card">
                     <h3>Cloud-Based</h3>
@@ -500,14 +594,14 @@
             <h2 lang="en">Customer Pain Points</h2>
             <ul lang="vi">
                 <li>Cập nhật nội dung thủ công qua USB tốn thời gian.</li>
-                <li>Không kiểm soát được trạng thái màn hình (Sống/Chết).</li>
+                <li>Không kiểm soát được trạng thái hoạt động của màn hình theo thời gian thực.</li>
                 <li>Nội dung không đồng nhất giữa các chi nhánh.</li>
                 <li>Chi phí vận hành và bảo trì cao.</li>
             </ul>
             <ul lang="en">
-                <li>Manual updates via USB are time-consuming.</li>
-                <li>No control over screen status (Online/Offline).</li>
-                <li>Inconsistent content across different branches.</li>
+                <li>Time-consuming manual content updates via USB.</li>
+                <li>Unable to monitor real-time screen operation status.</li>
+                <li>Inconsistent content across branches.</li>
                 <li>High operational and maintenance costs.</li>
             </ul>
         </div>
@@ -790,7 +884,6 @@
             document.body.classList.toggle('is-fullscreen', isFullscreen);
             if (isFullscreen) {
                 topControls.style.opacity = '0';
-                logo.style.opacity = '0';
             } else {
                 topControls.style.opacity = '1';
                 logo.style.opacity = '1';
@@ -813,7 +906,6 @@
                     const isFullCheck = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
                     if (isFullCheck) {
                         topControls.style.opacity = '0';
-                        logo.style.opacity = '0';
                         document.body.style.cursor = 'none';
                     }
                 }, 3000);
