@@ -281,6 +281,38 @@
             display: flex;
             gap: 2rem;
             z-index: 100;
+            opacity: 0.2;
+            /* Dimmed as requested */
+            transition: opacity 0.3s ease;
+        }
+
+        .navigation:hover {
+            opacity: 0.8;
+            /* Faint but visible on hover */
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 0.8rem 1.2rem;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: black;
+            transform: translateY(-2px);
+            opacity: 1;
         }
 
         .top-controls {
@@ -831,13 +863,28 @@
             <div style="margin-top: 2rem;">
                 <p>Email: Contact@velra.vn</p>
                 <p>Website: velra.vn</p>
-                <p>Hotline: 079 416 8368</p>
                 <p style="margin-top: 1rem; color: var(--primary); font-weight: 700;">
                     <span lang="vi">Hỏi & Đáp (Q&A)</span>
                     <span lang="en">Questions & Answers (Q&A)</span>
                 </p>
             </div>
         </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="navigation" id="nav-controls">
+        <button class="nav-btn" title="Previous" id="prev-btn">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </button>
+        <button class="nav-btn" title="Next" id="next-btn">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+        </button>
     </div>
 
 
@@ -850,6 +897,9 @@
         const fullscreenBtn = document.getElementById('fullscreen-btn');
         const topControls = document.querySelector('.top-controls');
         const logo = document.querySelector('.logo-top');
+        const navControls = document.getElementById('nav-controls');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
 
         function updateSlide() {
             slides.forEach((slide, index) => {
@@ -867,6 +917,20 @@
             currentLang = currentLang === 'vi' ? 'en' : 'vi';
             document.body.classList.toggle('lang-en', currentLang === 'en');
             updateSlide();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentSlide < slides.length - 1) {
+                currentSlide++;
+                updateSlide();
+            }
         });
 
         function toggleFullscreen() {
@@ -887,9 +951,11 @@
             document.body.classList.toggle('is-fullscreen', isFullscreen);
             if (isFullscreen) {
                 topControls.style.opacity = '0';
+                navControls.style.opacity = '0';
             } else {
                 topControls.style.opacity = '1';
                 logo.style.opacity = '1';
+                navControls.style.opacity = '0.2';
             }
         }
 
@@ -903,12 +969,14 @@
             if (isFull) {
                 topControls.style.opacity = '1';
                 logo.style.opacity = '1';
+                navControls.style.opacity = '0.8';
                 document.body.style.cursor = 'default';
                 clearTimeout(topControls.timer);
                 topControls.timer = setTimeout(() => {
                     const isFullCheck = !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
                     if (isFullCheck) {
                         topControls.style.opacity = '0';
+                        navControls.style.opacity = '0';
                         document.body.style.cursor = 'none';
                     }
                 }, 3000);
